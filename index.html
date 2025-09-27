@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <meta charset="utf-8">
+    <title>JS Game | Catch The Goblin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <style>
+        /* Existing styles */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background-color: black;
+            touch-action: none;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        #game-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            display: none;
+        }
+
+        #game-canvas {
+            display: block;
+            margin: 0 auto;
+            background-color: black;
+            outline: none;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+
+        #loading-message {
+            color: white;
+            font-size: 24px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Loading Message -->
+    <div id="loading-message">Loading game...</div>
+
+    <!-- Game Container -->
+    <div id="game-container">
+        <canvas id="game-canvas" tabindex="1"></canvas>
+    </div>
+
+    <script>
+        console.log("Page loading...");
+
+        // Timeout if the game does not load within a certain time
+        const loadingTimeout = setTimeout(() => {
+            document.getElementById('loading-message').textContent = "Failed to load game. Please try again.";
+            console.error("Game loading timeout: 'gameLoaded' event not received.");
+        }, 10000); // 10 seconds timeout
+
+        // Resize canvas to fit height or width and maintain aspect ratio
+        function resizeCanvas() {
+            const canvas = document.getElementById("game-canvas");
+            const aspectRatio = 192 / 176;
+
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            const isPortrait = windowHeight > windowWidth;
+
+            let cssWidth, cssHeight;
+
+            if (isPortrait) {
+                cssWidth = windowWidth;
+                cssHeight = windowWidth / aspectRatio;
+            } else {
+                cssHeight = windowHeight;
+                cssWidth = windowHeight * aspectRatio;
+            }
+
+            canvas.style.width = cssWidth + 'px';
+            canvas.style.height = cssHeight + 'px';
+            const devicePixelRatio = window.devicePixelRatio || 1;
+            canvas.width = Math.round(cssWidth * devicePixelRatio);
+            canvas.height = Math.round(cssHeight * devicePixelRatio);
+
+            canvas.style.marginLeft = ((windowWidth - cssWidth) / 2) + 'px';
+            canvas.style.marginTop = ((windowHeight - cssHeight) / 2) + 'px';
+        }
+
+        // Listen for the gameLoaded event from game.js
+        document.addEventListener('gameLoaded', function() {
+            console.log("Received 'gameLoaded' event from game.js.");
+            clearTimeout(loadingTimeout);
+            document.getElementById('loading-message').style.display = 'none';
+            document.getElementById('game-container').style.display = 'block';
+            resizeCanvas();
+            document.getElementById('game-canvas').focus();
+        });
+
+        window.addEventListener('resize', function() {
+            console.log("Window resized, adjusting canvas...");
+            resizeCanvas();
+        });
+    </script>
+
+    <!-- Reference the game.js file in the js folder -->
+    <script src="./js/game.js"></script> <!-- Ensure path is correct for local file loading -->
+
+</body>
+</html>
